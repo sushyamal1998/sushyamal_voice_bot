@@ -74,11 +74,12 @@ recognition.onresult = async (event) => {
     userText.innerText = text;
     statusDiv.innerText = "Thinking...";
 
-    const res = await fetch("YOUR_RENDER_BACKEND_URL/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({message: text})
+    const res = await fetch("https://sushyamal-voice-bot.onrender.com/chat", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({message: text})
     });
+
 
     const data = await res.json();
     botText.innerText = data.reply;
