@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
- 
+
 SYSTEM_PROMPT = """
 You are an AI voice bot representing Sushyamal Maji.
 
@@ -52,7 +52,7 @@ INSTRUCTIONS:
 - If asked behavioral questions, give practical examples.
 """
 
-"""
+
 
 class UserInput(BaseModel):
     message: str

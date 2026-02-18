@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sushyamal AI Voice Bot</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            width: 450px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #4f46e5;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: gray;
+        }
+        .conversation {
+            margin-top: 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Sushyamal AI Voice Interview Bot</h2>
+    <p>Ask me interview questions.</p>
+    <button id="micBtn">🎤 Start Speaking</button>
+    <div id="status">Idle</div>
+
+    <div class="conversation">
+        <p><strong>You:</strong> <span id="userText"></span></p>
+        <p><strong>Bot:</strong> <span id="botText"></span></p>
+    </div>
+</div>
+
+<script>
+const micBtn = document.getElementById("micBtn");
+const statusDiv = document.getElementById("status");
+const userText = document.getElementById("userText");
+const botText = document.getElementById("botText");
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = "en-US";
+
+micBtn.onclick = () => {
+    recognition.start();
+    statusDiv.innerText = "Listening...";
+};
+
+recognition.onresult = async (event) => {
+    const text = event.results[0][0].transcript;
+    userText.innerText = text;
+    statusDiv.innerText = "Thinking...";
+
+    const res = await fetch("YOUR_RENDER_BACKEND_URL/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: text})
+    });
+
+    const data = await res.json();
+    botText.innerText = data.reply;
+
+    speak(data.reply);
+};
+
+function speak(text) {
+    statusDiv.innerText = "Speaking...";
+    const utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(utterance);
+    utterance.onend = () => statusDiv.innerText = "Idle";
+}
+</script>
+
+</body>
+</html>
