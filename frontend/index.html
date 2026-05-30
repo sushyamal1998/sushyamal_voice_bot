@@ -61,6 +61,11 @@ const userText = document.getElementById("userText");
 const botText = document.getElementById("botText");
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+    alert("Speech Recognition is not supported in this browser. Please use Google Chrome.");
+}
+
 const recognition = new SpeechRecognition();
 recognition.lang = "en-US";
 
@@ -74,24 +79,44 @@ recognition.onresult = async (event) => {
     userText.innerText = text;
     statusDiv.innerText = "Thinking...";
 
-    const res = await fetch("https://sushyamal-voice-bot.onrender.com/chat", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({message: text})
-    });
+    try {
+        console.log("Sending:", text);
 
+        const res = await fetch("https://sushyamal-voice-bot.onrender.com/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: text })
+        });
 
-    const data = await res.json();
-    botText.innerText = data.reply;
+        console.log("Status:", res.status);
 
-    speak(data.reply);
+        const data = await res.json();
+
+        console.log("Response:", data);
+
+        botText.innerText = data.reply;
+
+        speak(data.reply);
+
+    } catch (error) {
+        console.error("ERROR:", error);
+        botText.innerText = "Error connecting to backend.";
+        statusDiv.innerText = "Idle";
+    }
 };
 
 function speak(text) {
     statusDiv.innerText = "Speaking...";
+
     const utterance = new SpeechSynthesisUtterance(text);
+
     speechSynthesis.speak(utterance);
-    utterance.onend = () => statusDiv.innerText = "Idle";
+
+    utterance.onend = () => {
+        statusDiv.innerText = "Idle";
+    };
 }
 </script>
 
